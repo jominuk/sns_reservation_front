@@ -5,12 +5,14 @@ import ListPostCreateModal from "@/components/modal/ListPostCreateModal";
 import { getList, postList } from "@/api/listApi";
 import { useRouter } from "next/navigation";
 import { useJwt } from "@/components/hooks/useJwt";
+import Image from "next/image";
 
 export type ListType = {
   id: number;
   title: string;
   content: string;
   createDate: string;
+  imageUrl: string | null;
 };
 
 const Page: React.FC = () => {
@@ -37,10 +39,14 @@ const Page: React.FC = () => {
     fetchData();
   }, [userId]);
 
-  const handleSave = async (title: string, content: string) => {
+  const handleSave = async (
+    title: string,
+    content: string,
+    image: File | null
+  ) => {
     const token = sessionStorage.getItem("token") || "";
     try {
-      await postList(token, title, content, userId);
+      await postList(token, title, content, userId, image);
       fetchData();
     } catch (error: any) {
       const errorMessage = error.message.replace(/^Error:\s*/, "");
@@ -100,6 +106,19 @@ const Page: React.FC = () => {
               {item.title}
             </h2>
             <p className="text-gray-700 mb-4">{item.content}</p>
+            {item.imageUrl && (
+              <div className="mb-4 relative w-full h-40">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  style={{ objectFit: "cover" }}
+                  className="rounded-lg"
+                  priority
+                />
+              </div>
+            )}
             <p className="text-gray-500 text-sm">
               Created on: {new Date(item.createDate).toLocaleString()}
             </p>

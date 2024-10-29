@@ -1,20 +1,28 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 
 type ModalProps = {
   show: boolean;
   onClose: () => void;
-  onSave: (title: string, content: string) => void;
+  onSave: (title: string, content: string, image: File | null) => void;
 };
 
 const ListPostCreateModal: FC<ModalProps> = ({ show, onClose, onSave }) => {
-  const [title, setTitle] = React.useState("");
-  const [content, setContent] = React.useState("");
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [image, setImage] = useState<File | null>(null);
 
   const handleSave = () => {
-    onSave(title, content);
+    onSave(title, content, image);
     setTitle("");
     setContent("");
+    setImage(null);
     onClose();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
   };
 
   if (!show) return null;
@@ -36,6 +44,22 @@ const ListPostCreateModal: FC<ModalProps> = ({ show, onClose, onSave }) => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            이미지 업로드
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+          />
+        </div>
         <div className="flex justify-end space-x-4">
           <button
             onClick={onClose}

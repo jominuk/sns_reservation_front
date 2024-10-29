@@ -5,15 +5,34 @@ export async function postList(
   token: string,
   title: string,
   content: string,
-  userId: string
+  userId: string,
+  image: File | null
 ) {
+  const formData = new FormData();
+
+  const dto = {
+    title: title,
+    content: content,
+    userId: userId,
+  };
+
+  formData.append(
+    "dto",
+    new Blob([JSON.stringify(dto)], {
+      type: "application/json",
+    })
+  );
+
+  if (image) {
+    formData.append("image", image);
+  }
+
   const response = await fetch("http://localhost:8080/list/post", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ title, content, userId }),
+    body: formData,
   });
 
   if (!response.ok) {
@@ -21,7 +40,6 @@ export async function postList(
     throw new Error(errorMessage);
   }
 }
-
 // 게시글 목록
 export async function getList(
   token: string,
